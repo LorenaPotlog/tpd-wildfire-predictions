@@ -1,0 +1,7 @@
+out/
+target/
+*.log
+.DS_Store
+.idea/
+data/
+.env
