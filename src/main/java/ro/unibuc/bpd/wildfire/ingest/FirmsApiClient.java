@@ -25,12 +25,16 @@ public final class FirmsApiClient {
     }
 
     public List<FireHotspotEvent> fetchHotspots() {
+        return fetchHotspots(config.firmsArea());
+    }
+
+    public List<FireHotspotEvent> fetchHotspots(String area) {
         ensureConfigured();
         String url = "%s/api/area/csv/%s/%s/%s/%d".formatted(
                 config.firmsBaseUrl(),
                 config.firmsMapKey(),
                 config.firmsSource(),
-                config.firmsArea(),
+                area,
                 config.firmsLookbackDays()
         );
 

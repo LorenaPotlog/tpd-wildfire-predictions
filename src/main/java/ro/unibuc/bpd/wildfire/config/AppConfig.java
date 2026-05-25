@@ -1,7 +1,9 @@
 package ro.unibuc.bpd.wildfire.config;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public record AppConfig(
@@ -48,6 +50,13 @@ public record AppConfig(
     private static String envOrDefault(String key, String fallback) {
         String value = System.getenv(key);
         return value == null || value.isBlank() ? fallback : value;
+    }
+
+    public List<String> firmsAreas() {
+        return Arrays.stream(firmsArea.split(";"))
+                .map(String::trim)
+                .filter(area -> !area.isBlank())
+                .toList();
     }
 
     private static Map<String, String> parseArgs(String[] args) {

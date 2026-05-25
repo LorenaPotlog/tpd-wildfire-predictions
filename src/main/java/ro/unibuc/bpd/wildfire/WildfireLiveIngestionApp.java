@@ -8,6 +8,7 @@ import ro.unibuc.bpd.wildfire.model.FireHotspotEvent;
 import ro.unibuc.bpd.wildfire.model.WeatherObservation;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -34,7 +35,7 @@ public final class WildfireLiveIngestionApp {
 
             while (true) {
                 try {
-                    pollOnce(firmsApiClient, openWeatherClient, publisher, seenEvents);
+                    pollOnce(firmsApiClient, openWeatherClient, publisher, seenEvents, config.firmsAreas());
                 } catch (Exception exception) {
                     System.err.println("Live ingestion poll failed: " + exception.getMessage());
                     exception.printStackTrace(System.err);
@@ -48,9 +49,19 @@ public final class WildfireLiveIngestionApp {
             FirmsApiClient firmsApiClient,
             OpenWeatherClient openWeatherClient,
             LiveKafkaPublisher publisher,
-            Map<String, Instant> seenEvents
+            Map<String, Instant> seenEvents,
+            List<String> areas
     ) {
-        List<FireHotspotEvent> fireEvents = firmsApiClient.fetchHotspots().stream()
+        List<FireHotspotEvent> fetchedEvents = new ArrayList<>();
+        for (String area : areas) {
+            try {
+                fetchedEvents.addAll(firmsApiClient.fetchHotspots(area));
+            } catch (Exception exception) {
+                System.err.println("Skipping FIRMS area " + area + ": " + exception.getMessage());
+            }
+        }
+
+        List<FireHotspotEvent> fireEvents = fetchedEvents.stream()
                 .sorted(Comparator.comparing(FireHotspotEvent::acquisitionTime))
                 .toList();
 
