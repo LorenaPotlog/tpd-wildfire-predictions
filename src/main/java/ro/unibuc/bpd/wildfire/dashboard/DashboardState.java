@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Locale;
 
 public final class DashboardState {
-    private static final int MAX_PREDICTIONS = 150;
+    private static final int MAX_PREDICTIONS = 1000;
 
     private final List<RiskPrediction> latestPredictions = new ArrayList<>();
     private Instant lastUpdate;
@@ -25,7 +25,9 @@ public final class DashboardState {
     }
 
     public synchronized DashboardSnapshot snapshot() {
-        List<RiskPrediction> copy = List.copyOf(latestPredictions);
+        List<RiskPrediction> copy = latestPredictions.stream()
+                .map(DashboardState::normalizedPrediction)
+                .toList();
         long extremeCount = copy.stream().filter(prediction -> "EXTREME".equals(prediction.riskLevel())).count();
         long highCount = copy.stream().filter(prediction -> "HIGH".equals(prediction.riskLevel())).count();
         double averageThreat = copy.stream()
@@ -55,8 +57,37 @@ public final class DashboardState {
                 && left.predictionTime().equals(right.predictionTime());
     }
 
+    private static RiskPrediction normalizedPrediction(RiskPrediction prediction) {
+        return new RiskPrediction(
+                prediction.predictionTime(),
+                prediction.latitude(),
+                prediction.longitude(),
+                prediction.cellId(),
+                prediction.zoneName(),
+                prediction.country(),
+                prediction.threatScore(),
+                riskLevel(prediction.threatScore()),
+                prediction.predictedSpreadBearing(),
+                prediction.estimatedSpreadVelocityKph(),
+                prediction.confidenceIndex(),
+                prediction.weatherFallbackUsed()
+        );
+    }
+
+    private static String riskLevel(double threatScore) {
+        if (threatScore >= 52.0) {
+            return "EXTREME";
+        }
+        if (threatScore >= 45.0) {
+            return "HIGH";
+        }
+        if (threatScore >= 30.0) {
+            return "MEDIUM";
+        }
+        return "LOW";
+    }
+
     private static double round(double value) {
         return Double.parseDouble(String.format(Locale.US, "%.1f", value));
     }
 }
-

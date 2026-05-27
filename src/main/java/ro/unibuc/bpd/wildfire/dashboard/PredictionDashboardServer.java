@@ -76,6 +76,7 @@ public final class PredictionDashboardServer {
         String path = exchange.getRequestURI().getPath();
         String resourcePath = switch (path) {
             case "/", "" -> "/ui/index.html";
+            case "/open-badges-prototype.html" -> "/ui/open-badges-prototype.html";
             case "/styles.css" -> "/ui/styles.css";
             case "/app.js" -> "/ui/app.js";
             default -> null;
@@ -119,4 +120,3 @@ public final class PredictionDashboardServer {
         return "text/html; charset=utf-8";
     }
 }
-

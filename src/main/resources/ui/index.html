@@ -14,6 +14,7 @@
     <section class="hero">
         <p class="eyebrow">Wildfire Expansion And Risk Predictor</p>
         <h1>Live risk board for streaming wildfire predictions.</h1>
+        <p class="hero-copy">Switch between monitoring regions and inspect the latest predictions for the selected area.</p>
         <div class="hero-meta">
             <div>
                 <span>Source flow</span>
@@ -32,9 +33,13 @@
         <div class="panel-header">
             <div>
                 <p class="panel-label">Live Feed</p>
-                <h2>Latest predictions</h2>
+                <h2 id="feed-title">Latest predictions</h2>
             </div>
             <p class="panel-hint" id="last-update">Waiting for data</p>
+        </div>
+        <div class="region-toolbar">
+            <div class="region-controls" id="region-controls" aria-label="Monitoring regions"></div>
+            <p class="panel-hint" id="region-summary">Showing the selected monitoring area.</p>
         </div>
         <div class="table-wrap">
             <table>
@@ -63,4 +68,3 @@
 <script src="/app.js"></script>
 </body>
 </html>
-
