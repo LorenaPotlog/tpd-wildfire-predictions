@@ -78,7 +78,6 @@ public final class RiskScoringService implements Serializable {
     }
 
     private static String riskLevel(double threatScore) {
-        // Calibrated to the current live FIRMS/OpenWeather score distribution so upper-end live events surface clearly.
         if (threatScore >= 52.0) {
             return "EXTREME";
         }

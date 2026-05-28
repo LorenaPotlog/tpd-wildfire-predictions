@@ -76,44 +76,4 @@ public class FireHotspotEvent implements Serializable {
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
-
-    public double getBrightness() {
-        return brightness;
-    }
-
-    public void setBrightness(double brightness) {
-        this.brightness = brightness;
-    }
-
-    public double getConfidence() {
-        return confidence;
-    }
-
-    public void setConfidence(double confidence) {
-        this.confidence = confidence;
-    }
-
-    public Instant getAcquisitionTime() {
-        return acquisitionTime;
-    }
-
-    public void setAcquisitionTime(Instant acquisitionTime) {
-        this.acquisitionTime = acquisitionTime;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public String getCellId() {
-        return cellId;
-    }
-
-    public void setCellId(String cellId) {
-        this.cellId = cellId;
-    }
 }
