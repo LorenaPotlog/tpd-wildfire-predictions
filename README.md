@@ -23,20 +23,6 @@ Two screen recordings of the dashboard are in [`src/main/resources/docs/demo/`](
 | **Live Data Demo** | Real-time pipeline: NASA FIRMS + OpenWeather → Kafka → Flink → dashboard | [Open video](https://github.com/LorenaPotlog/tpd-wildfire-predictions/blob/main/src/main/resources/docs/demo/demo-real-data.mp4) |
 | **Mock Seeder Demo** | Scripted demo with `WildfireSeederApp` — no API keys, predictable risk transitions | [Open video](https://github.com/LorenaPotlog/tpd-wildfire-predictions/blob/main/src/main/resources/docs/demo/demo-seeder.mp4) |
 
-### Live Data Demo
-
-End-to-end walkthrough with live external data feeding the risk dashboard.
-
-[▶ Watch Live Data Demo on GitHub](https://github.com/LorenaPotlog/tpd-wildfire-predictions/blob/main/src/main/resources/docs/demo/demo-real-data.mp4)
-
-### Mock Seeder Demo
-
-Controlled recording demo using the built-in seeder for low → medium → high → extreme risk scenarios.
-
-[▶ Watch Mock Seeder Demo on GitHub](https://github.com/LorenaPotlog/tpd-wildfire-predictions/blob/main/src/main/resources/docs/demo/demo-seeder.mp4)
-
-> **Note:** GitHub does not play repo videos inline inside README. Click a link above — the file page opens with a built-in player. Locally, open the `.mp4` files from `src/main/resources/docs/demo/`.
-
 ## What This Project Does
 
 The project has three main runtime pieces:
