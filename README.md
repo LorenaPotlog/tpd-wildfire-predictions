@@ -1,6 +1,6 @@
 # Wildfire Expansion and Risk Predictor
 
-Streaming project for estimating wildfire risk and likely spread direction from fire and weather data.
+Streaming project for estimating wildfire risk and likely spread direction from fire and weather data, then displaying the predictions in a local dashboard.
 
 ## Team
 
@@ -8,15 +8,34 @@ Streaming project for estimating wildfire risk and likely spread direction from 
 - Grigore Andreea-Isabela
 - Potlog Lorena-Elena
 
+## Dashboard UI
+
+Screenshot of the live wildfire risk dashboard (`http://localhost:7070`):
+
+![Wildfire Live Dashboard](src/main/resources/docs/demo/ui.png)
+
 ## Demo 
 
-Two screen recordings of the dashboard are stored in [`src/main/resources/docs/demo/`](src/main/resources/docs/demo/):
+Two screen recordings of the dashboard are in [`src/main/resources/docs/demo/`](src/main/resources/docs/demo/).
 
-| Title | What it shows | File |
-|-------|---------------|------|
-| **Live Data Demo** | Real-time pipeline: NASA FIRMS + OpenWeather → Kafka → Flink → dashboard | [`demo-real-data.mp4`](src/main/resources/docs/demo/demo-real-data.mp4) |
-| **Mock Seeder Demo** | Scripted demo with `WildfireSeederApp` — no API keys, predictable risk transitions | [`demo-seeder.mp4`](src/main/resources/docs/demo/demo-seeder.mp4) |
+| Title | What it shows | Watch |
+|-------|---------------|-------|
+| **Live Data Demo** | Real-time pipeline: NASA FIRMS + OpenWeather → Kafka → Flink → dashboard | [Open video](https://github.com/LorenaPotlog/tpd-wildfire-predictions/blob/main/src/main/resources/docs/demo/demo-real-data.mp4) |
+| **Mock Seeder Demo** | Scripted demo with `WildfireSeederApp` — no API keys, predictable risk transitions | [Open video](https://github.com/LorenaPotlog/tpd-wildfire-predictions/blob/main/src/main/resources/docs/demo/demo-seeder.mp4) |
 
+### Live Data Demo
+
+End-to-end walkthrough with live external data feeding the risk dashboard.
+
+[▶ Watch Live Data Demo on GitHub](https://github.com/LorenaPotlog/tpd-wildfire-predictions/blob/main/src/main/resources/docs/demo/demo-real-data.mp4)
+
+### Mock Seeder Demo
+
+Controlled recording demo using the built-in seeder for low → medium → high → extreme risk scenarios.
+
+[▶ Watch Mock Seeder Demo on GitHub](https://github.com/LorenaPotlog/tpd-wildfire-predictions/blob/main/src/main/resources/docs/demo/demo-seeder.mp4)
+
+> **Note:** GitHub does not play repo videos inline inside README. Click a link above — the file page opens with a built-in player. Locally, open the `.mp4` files from `src/main/resources/docs/demo/`.
 
 ## What This Project Does
 
@@ -53,6 +72,54 @@ WildfireSeederApp
         -> wildfire-risk-predictions
         -> local dashboard
 ```
+
+## Operating Modes
+
+This repo supports three distinct ways to run the app:
+
+### 1. Live streaming
+
+Use this when you want real data from NASA FIRMS and OpenWeather.
+
+Needed:
+
+- Docker stack
+- Flink risk job
+- dashboard server
+- live ingestion app
+- valid `FIRMS_MAP_KEY`
+- valid `OPENWEATHER_API_KEY`
+
+### 2. Mock demo seeder
+
+Use this when you want a controlled 3-4 minute recording/demo with predictable low/medium/high/extreme transitions.
+
+Needed:
+
+- Docker stack
+- dashboard server
+- mock-demo seeder
+
+Not needed:
+
+- live ingestion app
+- Flink risk job
+- external API keys
+
+The mock demo publishes predictions directly to `wildfire-risk-predictions`.
+
+### 3. Sample-input seeder
+
+Use this when you want the old sample resource behavior.
+
+Needed:
+
+- Docker stack
+- Flink risk job
+- dashboard server
+- seeder in `sample-inputs` mode
+
+The sample-input seeder publishes fire/weather inputs, not final predictions, so it still requires the Flink job.
 
 ## Kafka Topics
 
@@ -196,6 +263,130 @@ java -cp target/wildfire-streaming-1.0.0-jar-with-dependencies.jar \
 - Live ingestion frequency is controlled by `INGEST_POLL_SECONDS`.
 - If the dashboard looks static, it may still be refreshing correctly while waiting for fresh external events.
 
+## Mock Demo Runbook
+
+Use this when you want a predictable recording/demo with changing wildfire severity.
+
+### What it does
+
+The default `WildfireSeederApp` mode publishes a scripted prediction sequence directly into `wildfire-risk-predictions` for about 3.5 minutes.
+
+It includes different incident arcs such as:
+
+- a low-risk wildfire
+- a medium-risk wildfire
+- a wildfire escalating from medium to high
+- a wildfire escalating to extreme
+- a flare-up that later cools down
+
+### 1. Start infrastructure
+
+```bash
+docker compose up -d
+```
+
+### 2. Build the jar
+
+```bash
+mvn clean package
+```
+
+### 3. Start the dashboard
+
+```bash
+java -cp target/wildfire-streaming-1.0.0-jar-with-dependencies.jar \
+  ro.unibuc.bpd.wildfire.dashboard.PredictionDashboardServer
+```
+
+### 4. Run the scripted mock demo
+
+```bash
+java -cp target/wildfire-streaming-1.0.0-jar-with-dependencies.jar \
+  ro.unibuc.bpd.wildfire.WildfireSeederApp
+```
+
+### Optional demo tuning
+
+Longer demo:
+
+```bash
+java -cp target/wildfire-streaming-1.0.0-jar-with-dependencies.jar \
+  ro.unibuc.bpd.wildfire.WildfireSeederApp \
+  --demo-duration-seconds=240
+```
+
+More frequent demo updates:
+
+```bash
+java -cp target/wildfire-streaming-1.0.0-jar-with-dependencies.jar \
+  ro.unibuc.bpd.wildfire.WildfireSeederApp \
+  --demo-step-seconds=8
+```
+
+## Sample-Inputs Seeder Runbook
+
+Use this if you want the original sample fire/weather input behavior instead of the scripted direct-prediction demo.
+
+### 1. Start infrastructure
+
+```bash
+docker compose up -d
+```
+
+### 2. Build the jar
+
+```bash
+mvn clean package
+```
+
+### 3. Start the Flink job
+
+Use the same Flink submission steps from the live runbook.
+
+### 4. Start the dashboard
+
+```bash
+java -cp target/wildfire-streaming-1.0.0-jar-with-dependencies.jar \
+  ro.unibuc.bpd.wildfire.dashboard.PredictionDashboardServer
+```
+
+### 5. Run the seeder in sample-input mode
+
+```bash
+java -cp target/wildfire-streaming-1.0.0-jar-with-dependencies.jar \
+  ro.unibuc.bpd.wildfire.WildfireSeederApp \
+  --demo-mode=sample-inputs
+```
+
+## Stopping Things
+
+### Stop local Java processes
+
+Stop the terminal sessions running:
+
+- `PredictionDashboardServer`
+- `WildfireLiveIngestionApp`
+- `WildfireSeederApp`
+
+### Stop the Flink job
+
+List running jobs:
+
+```bash
+docker exec wildfire-jobmanager flink list
+```
+
+Cancel a job:
+
+```bash
+docker exec wildfire-jobmanager flink cancel <job-id>
+```
+
+### Stop the Docker stack
+
+```bash
+docker compose down
+```
 
 ## Monitoring
 
@@ -221,3 +412,7 @@ This usually means:
 - the page is refreshing
 - but no new prediction event has arrived yet
 
+### America or Africa shows nothing
+
+The UI region selector only filters what the backend has already produced.
+If a region is empty, check `FIRMS_AREA` and make sure live ingestion is polling that part of the world.
