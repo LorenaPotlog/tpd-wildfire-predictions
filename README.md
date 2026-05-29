@@ -8,6 +8,27 @@ Streaming project for estimating wildfire risk and likely spread direction from 
 - Grigore Andreea-Isabela
 - Potlog Lorena-Elena
 
+## Demo Videos
+
+Two screen recordings of the dashboard are stored in [`src/main/resources/docs/demo/`](src/main/resources/docs/demo/):
+
+| Title | What it shows | File |
+|-------|---------------|------|
+| **Live Data Demo** | Real-time pipeline: NASA FIRMS + OpenWeather → Kafka → Flink → dashboard | [`demo-real-data.mp4`](src/main/resources/docs/demo/demo-real-data.mp4) |
+| **Mock Seeder Demo** | Scripted demo with `WildfireSeederApp` — no API keys, predictable risk transitions | [`demo-seeder.mp4`](src/main/resources/docs/demo/demo-seeder.mp4) |
+
+### Live Data Demo
+
+End-to-end walkthrough with live external data feeding the risk dashboard.
+
+<video src="src/main/resources/docs/demo/demo-real-data.mp4" controls width="720"></video>
+
+### Mock Seeder Demo
+
+Controlled recording demo using the built-in seeder for low → medium → high → extreme risk scenarios.
+
+<video src="src/main/resources/docs/demo/demo-seeder.mp4" controls width="720"></video>
+
 ## What This Project Does
 
 The project has three main runtime pieces:
