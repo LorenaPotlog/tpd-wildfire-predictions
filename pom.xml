@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ro.unibuc.bpd</groupId>
+    <groupId>ro.upb</groupId>
     <artifactId>wildfire-streaming</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
@@ -103,7 +103,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>ro.unibuc.bpd.wildfire.WildfireRiskJob</mainClass>
+                            <mainClass>ro.upb.wildfire.WildfireRiskJob</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
