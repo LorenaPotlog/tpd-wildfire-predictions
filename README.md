@@ -1,6 +1,6 @@
 # Wildfire Expansion and Risk Predictor
 
-Streaming project for estimating wildfire risk and likely spread direction from fire and weather data, then displaying the predictions in a local dashboard.
+Streaming project for estimating wildfire risk and likely spread direction from fire and weather data.
 
 ## Team
 
@@ -9,8 +9,6 @@ Streaming project for estimating wildfire risk and likely spread direction from 
 - Potlog Lorena-Elena
 
 ## Dashboard UI
-
-Screenshot of the live wildfire risk dashboard (`http://localhost:7070`):
 
 ![Wildfire Live Dashboard](src/main/resources/docs/demo/ui.png)
 
@@ -30,14 +28,14 @@ The project has three main runtime pieces:
 - `WildfireLiveIngestionApp`
   Polls NASA FIRMS and OpenWeather, then writes live fire and weather events into Kafka.
 - `WildfireRiskJob`
-  Runs in Flink, consumes Kafka fire/weather events, calculates wildfire risk predictions, and publishes them to the `wildfire-risk-predictions` Kafka topic.
+  Runs in Flink, consumes Kafka fire and weather events, calculates wildfire risk predictions, and publishes them to the `wildfire-risk-predictions` Kafka topic.
 - `PredictionDashboardServer`
   Reads prediction events from Kafka and serves the local dashboard UI on `http://localhost:7070`.
 
 There is also one demo tool:
 
 - `WildfireSeederApp`
-  Can publish fake/demo data when you do not want to depend on live external APIs.
+  Can publish demo data in order to showcase the dashboard when needed.
 
 ## End-To-End Flow
 
@@ -249,131 +247,6 @@ java -cp target/wildfire-streaming-1.0.0-jar-with-dependencies.jar \
 - Live ingestion frequency is controlled by `INGEST_POLL_SECONDS`.
 - If the dashboard looks static, it may still be refreshing correctly while waiting for fresh external events.
 
-## Mock Demo Runbook
-
-Use this when you want a predictable recording/demo with changing wildfire severity.
-
-### What it does
-
-The default `WildfireSeederApp` mode publishes a scripted prediction sequence directly into `wildfire-risk-predictions` for about 3.5 minutes.
-
-It includes different incident arcs such as:
-
-- a low-risk wildfire
-- a medium-risk wildfire
-- a wildfire escalating from medium to high
-- a wildfire escalating to extreme
-- a flare-up that later cools down
-
-### 1. Start infrastructure
-
-```bash
-docker compose up -d
-```
-
-### 2. Build the jar
-
-```bash
-mvn clean package
-```
-
-### 3. Start the dashboard
-
-```bash
-java -cp target/wildfire-streaming-1.0.0-jar-with-dependencies.jar \
-  ro.unibuc.bpd.wildfire.dashboard.PredictionDashboardServer
-```
-
-### 4. Run the scripted mock demo
-
-```bash
-java -cp target/wildfire-streaming-1.0.0-jar-with-dependencies.jar \
-  ro.unibuc.bpd.wildfire.WildfireSeederApp
-```
-
-### Optional demo tuning
-
-Longer demo:
-
-```bash
-java -cp target/wildfire-streaming-1.0.0-jar-with-dependencies.jar \
-  ro.unibuc.bpd.wildfire.WildfireSeederApp \
-  --demo-duration-seconds=240
-```
-
-More frequent demo updates:
-
-```bash
-java -cp target/wildfire-streaming-1.0.0-jar-with-dependencies.jar \
-  ro.unibuc.bpd.wildfire.WildfireSeederApp \
-  --demo-step-seconds=8
-```
-
-## Sample-Inputs Seeder Runbook
-
-Use this if you want the original sample fire/weather input behavior instead of the scripted direct-prediction demo.
-
-### 1. Start infrastructure
-
-```bash
-docker compose up -d
-```
-
-### 2. Build the jar
-
-```bash
-mvn clean package
-```
-
-### 3. Start the Flink job
-
-Use the same Flink submission steps from the live runbook.
-
-### 4. Start the dashboard
-
-```bash
-java -cp target/wildfire-streaming-1.0.0-jar-with-dependencies.jar \
-  ro.unibuc.bpd.wildfire.dashboard.PredictionDashboardServer
-```
-
-### 5. Run the seeder in sample-input mode
-
-```bash
-java -cp target/wildfire-streaming-1.0.0-jar-with-dependencies.jar \
-  ro.unibuc.bpd.wildfire.WildfireSeederApp \
-  --demo-mode=sample-inputs
-```
-
-## Stopping Things
-
-### Stop local Java processes
-
-Stop the terminal sessions running:
-
-- `PredictionDashboardServer`
-- `WildfireLiveIngestionApp`
-- `WildfireSeederApp`
-
-### Stop the Flink job
-
-List running jobs:
-
-```bash
-docker exec wildfire-jobmanager flink list
-```
-
-Cancel a job:
-
-```bash
-docker exec wildfire-jobmanager flink cancel <job-id>
-```
-
-### Stop the Docker stack
-
-```bash
-docker compose down
-```
-
 ## Monitoring
 
 - Flink UI: `http://localhost:8081`
@@ -397,8 +270,3 @@ This usually means:
 
 - the page is refreshing
 - but no new prediction event has arrived yet
-
-### America or Africa shows nothing
-
-The UI region selector only filters what the backend has already produced.
-If a region is empty, check `FIRMS_AREA` and make sure live ingestion is polling that part of the world.
